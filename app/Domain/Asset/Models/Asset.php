@@ -32,6 +32,7 @@ class Asset extends Model implements IsActivitySubject
         'technical_information',
         'size',
         'file_type',
+        'is_private',
     ];
 
     protected $casts = [

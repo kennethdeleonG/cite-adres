@@ -20,6 +20,7 @@ class CreateAssetAction
             'technical_information' => $asset->technical_information,
             'size' => $asset->size,
             'file_type' => $asset->file_type,
+            'is_private' => $asset->is_private,
         ]);
 
         return $model;

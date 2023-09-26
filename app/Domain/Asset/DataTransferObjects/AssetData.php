@@ -18,6 +18,7 @@ class AssetData implements Arrayable
         public readonly ?string $file_type = null,
         public readonly ?int $author_id = null,
         public readonly ?int $folder_id,
+        public readonly ?bool $is_private = false,
     ) {
     }
 
@@ -32,6 +33,7 @@ class AssetData implements Arrayable
             file_type: $data['file_type'] ?? null,
             author_id: $data['author_id'] ?? null,
             folder_id: $data['folder_id'] ?? null,
+            is_private: $data['is_private'] ?? false,
         );
     }
 

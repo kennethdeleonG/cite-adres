@@ -33,10 +33,6 @@ trait FileActions
                 'action' => 'view-details',
                 'label' => 'View Details',
             ],
-            [
-                'action' => 'rename',
-                'label' => 'Rename',
-            ],
         ];
     }
 }

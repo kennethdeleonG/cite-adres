@@ -11,4 +11,11 @@ trait CustomPagination
     public mixed $folderList;
     public int $folderCount = 0;
     public int $folderPage = 1;
+
+    //assets
+    public bool $loadMoreAssetsReached = false;
+    public mixed $assetList;
+    public int $assetCount = 0;
+    public int $assetPage = 1;
+    public bool $showAssetList = false;
 }

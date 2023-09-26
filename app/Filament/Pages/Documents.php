@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Domain\Asset\Models\Asset;
 use App\Domain\Folder\Models\Folder as FolderModel;
 use App\Domain\Folder\Actions\CreateFolderAction;
 use App\Domain\Folder\DataTransferObjects\FolderData;
@@ -59,15 +60,31 @@ class Documents extends Page
         $this->folderCount = $folderQueryData->lastPage();
         $this->folderList = new Collection($folderQueryData->items());
 
-        // if (count($this->folderList) <= 16) {
-        //     $assetQueryData = $this->getAssets();
-        //     if (count($assetQueryData->items()) > 0) {
-        //         $this->assetCount = $assetQueryData->lastPage();
-        //     } else {
-        //         $this->assetCount = 0;
-        //     }
-        //     $this->assetList = new Collection($assetQueryData->items());
-        // }
+        if (count($this->folderList) <= 16) {
+            $assetQueryData = $this->getAssets();
+            if (count($assetQueryData->items()) > 0) {
+                $this->assetCount = $assetQueryData->lastPage();
+            } else {
+                $this->assetCount = 0;
+            }
+            $this->assetList = new Collection($assetQueryData->items());
+        }
+    }
+
+    /** @return LengthAwarePaginator<Asset> */
+    public function getAssets(int $page = 1): LengthAwarePaginator
+    {
+
+        $result = Asset::with('folder')->where(function ($query) {
+            if ($this->folder_id) {
+                $query->where('folder_id', $this->folder_id);
+            } else {
+                $query->whereNull('folder_id');
+            }
+        })->orderBy('name')
+            ->paginate(32, page: $page);
+
+        return $result;
     }
 
     /** @return LengthAwarePaginator<FolderModel> */
@@ -172,5 +189,18 @@ class Documents extends Page
                     break;
                 }
         }
+    }
+
+    public function getFolderSize(int $folder_id): string
+    {
+        $folder = $this->folderList->where('id', $folder_id)->first();
+
+        $folderIds = $folder->descendants->pluck('id')->toArray();
+
+        return $this->convertedAssetSize(
+            (int) Asset::whereIn('folder_id', $folderIds)
+                ->orWhere('folder_id', $folder_id)
+                ->sum('size')
+        );
     }
 }

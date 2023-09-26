@@ -6,6 +6,7 @@ namespace App\Domain\Folder\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
+use App\Domain\Asset\Models\Asset;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;

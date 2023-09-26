@@ -6,7 +6,11 @@
         <div class="filament-tables-column-wrapper">
             <div class="filament-tables-text-column px-4 ">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                    <div style="width: 70%">
+                    <div style="width: 70%; display: flex; justify-content: flex-start">
+                        @if ($type == 'folder')
+                            <img src="{{ asset('images/icons/folder.svg') }}" alt=""
+                                style="width: 25px; margin-right: 7px;" />
+                        @endif
                         <span>{{ $document->name }}</span>
                     </div>
                 </div>
@@ -18,7 +22,11 @@
             <div class="filament-tables-text-column px-4 ">
                 <div class="inline-flex items-center space-x-1 rtl:space-x-reverse">
                     <span class="text-sm">
-                        -----
+                        @if ($type == 'folder')
+                            {{ $this->getFolderSize($document->id) }}
+                        @else
+                            {{ $this->convertedAssetSize($asset->size ?: 0) }}
+                        @endif
                     </span>
                 </div>
             </div>
@@ -31,6 +39,8 @@
                     <span class="text-sm">
                         @if ($type == 'folder')
                             Folder
+                        @else
+                            {{ $document->file_type }}
                         @endif
                     </span>
                 </div>
@@ -53,7 +63,7 @@
             <div class="filament-tables-text-column px-4 ">
                 <div class="inline-flex items-center space-x-1 rtl:space-x-reverse">
                     <span class="text-sm">
-                        {{ $folder->is_private ? 'Private' : 'Public' }}
+                        {{ $document->is_private ? 'Private' : 'Public' }}
                     </span>
                 </div>
             </div>

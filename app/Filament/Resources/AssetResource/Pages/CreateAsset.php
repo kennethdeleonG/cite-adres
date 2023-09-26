@@ -38,7 +38,6 @@ class CreateAsset extends CreateRecord
         $data['path'] = $this->ownerRecord ? $this->ownerRecord->path : '' . '/' . Str::slug($data['name']);
         $data['author_id'] = auth()->user()->id;
 
-
         return DB::transaction(
             fn () => app(CreateAssetAction::class)
                 ->execute(AssetData::fromArray($data))

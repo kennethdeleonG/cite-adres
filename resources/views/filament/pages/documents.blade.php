@@ -61,6 +61,14 @@
                         'actions' => $this->getFileActions(),
                     ])
                 @endforeach
+
+                @foreach ($this->assetList as $asset)
+                    @include('filament.components.document-table-body', [
+                        'document' => $asset,
+                        'type' => 'asset',
+                        'actions' => $this->getFileActions(),
+                    ])
+                @endforeach
             </tbody>
         </table>
     </div>
