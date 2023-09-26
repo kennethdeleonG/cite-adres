@@ -78,8 +78,8 @@
     <div class="w-full h-auto ">
         <h1 class="text-[40px] text-center w-full mt-2"> Features</h1>
 
-        <div class="mx-24 flex justify-between items-start mt-4">
-            <div class="w-1/2 ">
+        <div class="mx-24 flex justify-center items-start mt-4">
+            <div class="w-1/2 flex justify-center ">
                 <div
                     class="max-w-lg bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                     <img class="rounded-t-lg" src="{{ asset('images/home-bg.jpg') }}" alt="" />
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <div class="w-1/2 ">
+            <div class="w-1/2 flex justify-center">
                 <div
                     class="max-w-lg bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                     <img class="rounded-t-lg" src="{{ asset('images/home-bg.jpg') }}" alt="" />
