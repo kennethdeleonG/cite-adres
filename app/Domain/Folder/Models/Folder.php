@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Faculty\Models;
+namespace App\Domain\Folder\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use AlexJustesen\FilamentSpatieLaravelActivitylog\Contracts\IsActivitySubject;
