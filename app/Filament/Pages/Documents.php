@@ -243,6 +243,15 @@ class Documents extends Page
 
                     break;
                 }
+            case 'delete': {
+                    $folderToDelete = json_decode($record);
+
+                    $this->folderList = $this->folderList->reject(function ($item) use ($folderToDelete) {
+                        return $item->id === $folderToDelete->id;
+                    });
+
+                    break;
+                }
             default: {
                     break;
                 }
@@ -271,6 +280,10 @@ class Documents extends Page
                 case 'open': {
                         $this->getFolderWithId($folder->id);
 
+                        break;
+                    }
+                case 'delete': {
+                        $this->emitTo('filament.livewire.folder-modal', 'deleteFolder', $folder);
                         break;
                     }
                 default: {

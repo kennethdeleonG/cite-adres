@@ -72,4 +72,5 @@
         </table>
     </div>
 
+    <livewire:filament.livewire.folder-modal />
 </x-filament::page>
