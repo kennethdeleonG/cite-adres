@@ -7,6 +7,9 @@ namespace App\Filament\Pages;
 use App\Domain\Folder\Models\Folder as FolderModel;
 use App\Domain\Folder\Actions\CreateFolderAction;
 use App\Domain\Folder\DataTransferObjects\FolderData;
+use App\Support\Concerns\CustomFormatHelper;
+use App\Support\Concerns\CustomPagination;
+use App\Support\Concerns\FileActions;
 use App\Support\Concerns\FolderActions;
 use Filament\Pages\Page;
 use Filament\Pages\Actions;
@@ -14,9 +17,15 @@ use Filament\Forms;
 use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Documents extends Page
 {
+    use FileActions;
+    use CustomPagination;
+    use CustomFormatHelper;
+
     public ?int $folder_id = null;
 
     protected ?string $heading = 'Documents';
@@ -27,12 +36,39 @@ class Documents extends Page
     {
         $this->folder_id = intval($folderId);
 
-        // $this->fetchData();
+        $this->fetchData();
+    }
 
-        // //create another counter to count all folder
+    private function fetchData(): void
+    {
+        $folderQueryData = $this->getFolders();
+        $this->folderCount = $folderQueryData->lastPage();
+        $this->folderList = new Collection($folderQueryData->items());
+
         // if (count($this->folderList) <= 16) {
-        //     $this->showAssetList = true;
+        //     $assetQueryData = $this->getAssets();
+        //     if (count($assetQueryData->items()) > 0) {
+        //         $this->assetCount = $assetQueryData->lastPage();
+        //     } else {
+        //         $this->assetCount = 0;
+        //     }
+        //     $this->assetList = new Collection($assetQueryData->items());
         // }
+    }
+
+    /** @return LengthAwarePaginator<FolderModel> */
+    public function getFolders(int $page = 1): LengthAwarePaginator
+    {
+        $result = FolderModel::with(['descendants'])->where(function ($query) {
+            if ($this->folder_id) {
+                $query->where('folder_id', $this->folder_id);
+            } else {
+                $query->whereNull('folder_id');
+            }
+        })->orderBy('name')
+            ->paginate(32, page: $page);
+
+        return $result;
     }
 
     //right actions
@@ -109,11 +145,25 @@ class Documents extends Page
             ->execute(FolderData::fromArray($data));
 
         if ($result instanceof FolderModel) {
-            // $this->refreshingFolder('create', $result);
+            $this->refreshingFolder('create', $result);
             Notification::make()
                 ->title('Folder Created')
                 ->success()
                 ->send();
+        }
+    }
+
+    public function refreshingFolder(string $action, mixed $record): void
+    {
+        switch ($action) {
+            case 'create': {
+                    $this->fetchData();
+
+                    break;
+                }
+            default: {
+                    break;
+                }
         }
     }
 }
