@@ -19,6 +19,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Filament\Navigation\NavigationItem;
 
 class Documents extends Page
 {
@@ -37,6 +38,19 @@ class Documents extends Page
         $this->folder_id = intval($folderId);
 
         $this->fetchData();
+    }
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->group(static::getNavigationGroup())
+                ->icon(static::getNavigationIcon())
+                ->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.assets.*') || request()->routeIs("filament.pages.documents"))
+                ->sort(static::getNavigationSort())
+                ->badge(static::getNavigationBadge(), color: static::getNavigationBadgeColor())
+                ->url(static::getNavigationUrl()),
+        ];
     }
 
     private function fetchData(): void
@@ -106,13 +120,6 @@ class Documents extends Page
                 Actions\Action::make('new-asset')
                     ->label('New Document')
                     ->action(function () {
-                        // temp comment uncomment if creation of assets will not be allowed on root directory
-                        if ($this->folder_id <= 0) {
-                            return Notification::make()
-                                ->title('Please Create Document Inside Folders')
-                                ->warning()
-                                ->send();
-                        }
                         $folder = FolderModel::find($this->folder_id);
 
                         return redirect()->route('filament.resources.assets.create', $folder);
