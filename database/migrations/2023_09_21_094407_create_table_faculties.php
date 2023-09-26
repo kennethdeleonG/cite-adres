@@ -19,6 +19,11 @@ return new class extends Migration
 
             $table->string('first_name')->index();
             $table->string('last_name')->index();
+            $table->longText('address')->nullable();
+            $table->string('mobile')->nullable();
+            $table->string('gender')->nullable();
+            $table->longText('designation')->nullable();
+
             $table->string('email')->unique();
             $table->string('password')->nullable();
             $table->string('status')->default(FacultyStatuses::ACTIVE->value)->index()->nullable();

@@ -19,6 +19,10 @@ class Faculty extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'first_name',
         'last_name',
+        'address',
+        'mobile',
+        'gender',
+        'designation',
         'email',
         'password',
         'status',
