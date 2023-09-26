@@ -10,6 +10,9 @@
                         @if ($type == 'folder')
                             <img src="{{ asset('images/icons/folder.svg') }}" alt=""
                                 style="width: 25px; margin-right: 7px;" />
+                        @else
+                            <img src="{{ asset("images/icons/{$this->getAssetIconImage($document)}") }}" alt=""
+                                style="width: 25px; margin-right: 7px;" />
                         @endif
                         <span>{{ $document->name }}</span>
                     </div>

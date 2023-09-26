@@ -58,7 +58,7 @@
                     @include('filament.components.document-table-body', [
                         'document' => $folder,
                         'type' => 'folder',
-                        'actions' => $this->getFileActions(),
+                        'actions' => $this->getFolderActions(),
                     ])
                 @endforeach
 
@@ -66,7 +66,7 @@
                     @include('filament.components.document-table-body', [
                         'document' => $asset,
                         'type' => 'asset',
-                        'actions' => $this->getFileActions(),
+                        'actions' => $this->getAssetActions(),
                     ])
                 @endforeach
             </tbody>

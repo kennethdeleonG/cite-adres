@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support\Concerns;
 
-trait FileActions
+trait FolderTrait
 {
-    public function getFileActions(): array
+    public function getFolderActions(): array
     {
         return [
             [

@@ -8,10 +8,10 @@ use App\Domain\Asset\Models\Asset;
 use App\Domain\Folder\Models\Folder as FolderModel;
 use App\Domain\Folder\Actions\CreateFolderAction;
 use App\Domain\Folder\DataTransferObjects\FolderData;
+use App\Support\Concerns\AssetTrait;
 use App\Support\Concerns\CustomFormatHelper;
 use App\Support\Concerns\CustomPagination;
-use App\Support\Concerns\FileActions;
-use App\Support\Concerns\FolderActions;
+use App\Support\Concerns\FolderTrait;
 use Filament\Pages\Page;
 use Filament\Pages\Actions;
 use Filament\Forms;
@@ -24,7 +24,8 @@ use Filament\Navigation\NavigationItem;
 
 class Documents extends Page
 {
-    use FileActions;
+    use FolderTrait;
+    use AssetTrait;
     use CustomPagination;
     use CustomFormatHelper;
 
