@@ -91,7 +91,7 @@ class AssetResource extends Resource
         return [
             'index' => Pages\ListAssets::route('/'),
             'create' => Pages\CreateAsset::route('/file/create/{ownerRecord?}'),
-
+            'edit' => Pages\EditAsset::route('/file/{record}/edit/{ownerRecord?}'),
         ];
     }
 }
