@@ -14,8 +14,6 @@ use Illuminate\Support\Str;
 
 class CreateAsset extends CreateRecord
 {
-    protected ?string $heading = 'Create Document';
-
     protected static string $resource = AssetResource::class;
 
     public mixed $ownerRecord = null;

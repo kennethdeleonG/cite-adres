@@ -35,6 +35,14 @@ class Documents extends Page
 
     protected static string $view = 'filament.pages.documents';
 
+    protected static ?string $slug = '/documents/{folderId?}';
+
+    /** @var array */
+    protected $listeners = [
+        'refreshPage' => 'refreshingFolder',
+        'folderIdUpdated' => 'getFolderWithId',
+    ];
+
     public function mount(string $folderId = null): void
     {
         $this->folder_id = intval($folderId);
@@ -48,7 +56,8 @@ class Documents extends Page
             NavigationItem::make(static::getNavigationLabel())
                 ->group(static::getNavigationGroup())
                 ->icon(static::getNavigationIcon())
-                ->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.assets.*') || request()->routeIs("filament.pages.documents"))
+                ->isActiveWhen(fn (): bool => request()->routeIs('filament.resources.assets.*')
+                    || request()->routeIs("filament.pages./documents/*"))
                 ->sort(static::getNavigationSort())
                 ->badge(static::getNavigationBadge(), color: static::getNavigationBadgeColor())
                 ->url(static::getNavigationUrl()),
@@ -136,7 +145,7 @@ class Documents extends Page
                     ])
                     ->action('createFolder'),
                 Actions\Action::make('new-asset')
-                    ->label('New Document')
+                    ->label('New Asset')
                     ->action(function () {
                         $folder = FolderModel::find($this->folder_id);
 
@@ -203,5 +212,46 @@ class Documents extends Page
                 ->orWhere('folder_id', $folder_id)
                 ->sum('size')
         );
+    }
+
+    public function mountActionFolder(string $action, int $folderId): void
+    {
+        $folder = $this->folderList->where('id', $folderId)->first();
+
+        if ($folder) {
+            switch ($action) {
+                case 'open': {
+                        $this->getFolderWithId($folder->id);
+
+                        break;
+                    }
+                default: {
+                        break;
+                    }
+            }
+        }
+    }
+
+    public function mountActionAsset(string $action, int $assetId)
+    {
+        $asset = Asset::find($assetId);
+
+        if ($asset) {
+            return match ($action) {
+                'open' => redirect(route('filament.resources.assets.edit', ['record' => $asset, 'ownerRecord' => $asset->folder ?? null])),
+                default => null
+            };
+        }
+
+        return null;
+    }
+
+    /**
+     * Get an instance of the redirector.
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public function getFolderWithId(int $folderId)
+    {
+        return redirect()->to(self::getUrl() . '/' . $folderId);
     }
 }

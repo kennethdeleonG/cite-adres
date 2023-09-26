@@ -1,5 +1,4 @@
 <x-filament::page>
-
     <div
         class="filament-tables-table-container overflow-x-auto relative dark:border-gray-700 border-t p-2 space-y-2 bg-white rounded-xl shadow dark:bg-gray-800">
         <table class="filament-tables-table w-full text-start divide-y table-auto dark:divide-gray-700">
@@ -46,7 +45,7 @@
                             class="flex items-center gap-x-1 w-full px-4 py-2 whitespace-nowrap font-medium text-sm text-gray-600
                                 dark:text-gray-300 cursor-default ">
                             <span>
-                                Status
+                                Visibility
                             </span>
                         </div>
                     </th>

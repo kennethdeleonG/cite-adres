@@ -60,7 +60,7 @@
             </thead>
             <tbody class="divide-y whitespace-nowrap dark:divide-gray-700">
                 @include('filament.components.recent-files-table-body', [
-                    'actions' => $this->getFileActions(),
+                    'actions' => $this->getFolderActions(),
                 ])
             </tbody>
         </table>
