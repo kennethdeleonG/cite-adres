@@ -108,7 +108,7 @@ class FacultyResource extends Resource
                     ])->columns(2),
 
 
-                ]),
+                ])->hiddenOn('edit'),
             ]);
     }
 
@@ -144,13 +144,6 @@ class FacultyResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

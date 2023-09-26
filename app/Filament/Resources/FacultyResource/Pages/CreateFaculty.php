@@ -22,7 +22,6 @@ class CreateFaculty extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-
         return DB::transaction(
             fn () => app(CreateFacultyAction::class)
                 ->execute(FacultyData::fromArray($data))

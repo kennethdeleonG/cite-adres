@@ -8,15 +8,13 @@ use App\Domain\Faculty\DataTransferObjects\FacultyData;
 use App\Domain\Faculty\Models\Faculty;
 use Illuminate\Auth\Events\Registered;
 
-class CreateFacultyAction
+class UpdateFacultyAction
 {
-    public function execute(FacultyData $facultyData): Faculty
+    public function execute(Faculty $record, FacultyData $facultyData): Faculty
     {
-        $faculty =  Faculty::create([
+        $record->update([
             'first_name' => $facultyData->first_name,
             'last_name' => $facultyData->last_name,
-            'email' => $facultyData->email,
-            'password' => $facultyData->password,
             'address' => $facultyData->address,
             'gender' => $facultyData->gender,
             'mobile' => $facultyData->mobile,
@@ -24,12 +22,9 @@ class CreateFacultyAction
         ]);
 
         if ($facultyData->image) {
-
-            $faculty->addMediaFromDisk($facultyData->image->getRealPath(), 's3')->toMediaCollection('image');
+            $record->addMediaFromDisk($facultyData->image->getRealPath(), 's3')->toMediaCollection('image');
         }
 
-        event(new Registered($faculty));
-
-        return $faculty;
+        return $record;
     }
 }
