@@ -12,6 +12,9 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
+use Illuminate\Support\Str;
 
 class FacultyResource extends Resource
 {
@@ -26,7 +29,30 @@ class FacultyResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\FileUpload::make('image')
                         ->label('Profile Picture')
-                        ->image(),
+                        ->formatStateUsing(function ($record) {
+                            return $record?->getMedia('image')
+                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                ->toArray() ?? [];
+                        })
+                        ->image()
+                        ->beforeStateDehydrated(null)
+                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                            $mediaClass = config('media-library.media_model', Media::class);
+
+                            /** @var ?Media $media */
+                            $media = $mediaClass::findByUuid($file);
+
+                            if ($component->getVisibility() === 'private') {
+                                try {
+                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                } catch (Throwable $exception) {
+                                    // This driver does not support creating temporary URLs.
+                                }
+                            }
+
+                            return $media?->getUrl();
+                        }),
                     Forms\Components\Group::make([
                         Forms\Components\TextInput::make('first_name')
                             ->label('First Name')
@@ -44,6 +70,7 @@ class FacultyResource extends Resource
                     Forms\Components\Group::make([
                         Forms\Components\TextInput::make('mobile')
                             ->label('Phone Number')
+                            ->minLength(11)
                             ->maxLength(11),
                         Forms\Components\Select::make('gender')
                             ->required()
@@ -57,7 +84,6 @@ class FacultyResource extends Resource
                         ->label('Designation')
                         ->maxLength(100),
                 ]),
-
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('email')
                         ->required()
@@ -69,12 +95,16 @@ class FacultyResource extends Resource
                             ->required()
                             ->password()
                             ->label('Password')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('confirm_password')
+                            ->maxLength(20)
+                            ->minLength(8)
+                            ->confirmed(),
+                        Forms\Components\TextInput::make('password_confirmation')
                             ->required()
                             ->password()
                             ->label('Confirm Password')
-                            ->maxLength(100),
+                            ->maxLength(20)
+                            ->minLength(8)
+                            ->dehydrated(false),
                     ])->columns(2),
 
 
@@ -86,7 +116,24 @@ class FacultyResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->label(trans('Name'))
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query
+                            ->orderBy('first_name', $direction);
+                    })
+                    ->formatStateUsing(function ($record) {
+                        return Str::limit($record->first_name . ' ' . $record->last_name, 50);
+                    })
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%");
+                    }),
+                Tables\Columns\TextColumn::make('designation')
+                    ->label(trans('Designation'))
+                    ->formatStateUsing(function ($record) {
+                        return $record->designation ?? 'N/A';
+                    })
             ])
             ->filters([
                 //

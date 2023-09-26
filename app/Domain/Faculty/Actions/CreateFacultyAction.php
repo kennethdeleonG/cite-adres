@@ -8,6 +8,7 @@ use App\Domain\Faculty\DataTransferObjects\FacultyData;
 use App\Domain\Faculty\Enums\RegisterStatus;
 use App\Domain\Faculty\Models\Faculty;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\UploadedFile;
 
 class CreateFacultyAction
 {
@@ -19,6 +20,11 @@ class CreateFacultyAction
             'email' => $facultyData->email,
             'password' => $facultyData->password,
         ]);
+
+        if ($facultyData->image) {
+
+            $faculty->addMediaFromDisk($facultyData->image->getRealPath(), 's3')->toMediaCollection('image');
+        }
 
         event(new Registered($faculty));
 
