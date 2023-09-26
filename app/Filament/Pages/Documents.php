@@ -21,6 +21,8 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Filament\Navigation\NavigationItem;
+use Illuminate\Support\HtmlString;
+use Illuminate\View\View;
 
 class Documents extends Page
 {
@@ -48,6 +50,52 @@ class Documents extends Page
         $this->folder_id = intval($folderId);
 
         $this->fetchData();
+    }
+
+    //custom header
+    protected function getHeader(): ?View
+    {
+        return view('filament.components.custom-header');
+    }
+
+    //for breadcrumbs in body
+    public function getBreadcrumbsMenu(): array
+    {
+        if (is_null($this->folder_id) || !empty($this->search) || !empty($this->filterBy)) {
+            return [];
+        }
+
+        $parentFolder = FolderModel::find($this->folder_id);
+
+        if (is_null($parentFolder) || is_null($parentFolder->ancestors)) {
+            return [];
+        }
+
+        $folderAncestors = $parentFolder->ancestors->toArray();
+
+        $crumbs = [];
+        foreach ($folderAncestors as $node) {
+            $truncatedName = Str::limit($node['name'], 20, '...');
+            $tooltip = $node['name'];
+            $crumbs[self::getUrl() . '/' . $node['id']] = new HtmlString('<span title="' . $tooltip . '">' . $truncatedName . '</span>');
+        }
+        $truncatedParentFolderName = Str::limit($parentFolder->name, 20, '...');
+        $crumbs[self::getUrl() . '/' . $parentFolder->id] = new HtmlString('<span title="' . $parentFolder->name . '">' . $truncatedParentFolderName . '</span>');
+
+        $rootMenu = [
+            self::getUrl() => trans('Root Directory'),
+        ];
+
+        $mergedCrumbs = array_merge($rootMenu, $crumbs);
+
+        return $mergedCrumbs;
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        return [
+            self::getUrl() => trans('Document'),
+        ];
     }
 
     public static function getNavigationItems(): array
