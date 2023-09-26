@@ -7,6 +7,8 @@ namespace App\Filament\Pages;
 use App\Domain\Asset\Models\Asset;
 use App\Domain\Folder\Models\Folder as FolderModel;
 use App\Domain\Folder\Actions\CreateFolderAction;
+use App\Domain\Folder\Actions\DownloadFolderAction;
+use App\Domain\Folder\DataTransferObjects\DownloadData;
 use App\Domain\Folder\DataTransferObjects\FolderData;
 use App\Support\Concerns\AssetTrait;
 use App\Support\Concerns\CustomFormatHelper;
@@ -21,8 +23,10 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Filament\Navigation\NavigationItem;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\View;
+use Throwable;
 
 class Documents extends Page
 {
@@ -284,6 +288,40 @@ class Documents extends Page
             switch ($action) {
                 case 'open': {
                         $this->getFolderWithId($folder->id);
+
+                        break;
+                    }
+                case 'download': {
+                        if (!Storage::disk('s3')->exists($folder->path)) {
+                            Notification::make()
+                                ->title("Can't download. This directory is empty.")
+                                ->warning()
+                                ->send();
+                        } else {
+
+                            try {
+                                $url = app(DownloadFolderAction::class)->execute(
+                                    DownloadData::fromArray(
+                                        [
+                                            'directories' => [$folder->path],
+                                            'files' => [''],
+                                            'user_type' => 'admin',
+                                            'admin_id' => auth()->user()?->id,
+                                            'asset_type' => 'directory',
+                                            'asset_id' => $folder->id,
+                                        ]
+                                    )
+                                );
+
+                                redirect($url);
+                            } catch (Throwable $th) {
+
+                                Notification::make()
+                                    ->title($th->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }
 
                         break;
                     }
