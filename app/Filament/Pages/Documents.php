@@ -243,6 +243,11 @@ class Documents extends Page
 
                     break;
                 }
+            case 'update': {
+                    $this->fetchData();
+
+                    break;
+                }
             case 'delete': {
                     $folderToDelete = json_decode($record);
 
@@ -279,6 +284,11 @@ class Documents extends Page
             switch ($action) {
                 case 'open': {
                         $this->getFolderWithId($folder->id);
+
+                        break;
+                    }
+                case 'edit': {
+                        $this->emitTo('filament.livewire.folder-modal', 'editFolder', $folder);
 
                         break;
                     }

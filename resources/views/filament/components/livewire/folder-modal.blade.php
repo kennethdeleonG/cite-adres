@@ -17,6 +17,42 @@
         }
     </style>
 
+    {{-- edit folder modal --}}
+    <x-filament::modal id="edit-folder-modal-handle" width="md" displayClasses="block">
+        <form class="space-y-4" wire:submit.prevent="submit">
+
+            {{-- tricks to disable autofocus --}}
+            <input type="text" hidden autofocus />
+
+            <x-slot name="header">
+                <x-filament::modal.heading>
+                    Edit Folder
+                </x-filament::modal.heading>
+            </x-slot>
+
+            <div class="filament-modal-content">
+                {{ $this->form }}
+            </div>
+
+            <x-slot name="footer">
+                <div class="filament-modal-actions flex flex-wrap items-center gap-4 rtl:space-x-reverse">
+                    <x-filament::button type="submit" wire:click="editAction" wire:loading.attr="disabled">
+                        <span wire:target="editAction" wire:loading.remove>
+                            Save
+                        </span>
+                        <span wire:target="editAction" wire:loading>
+                            Saving...
+                        </span>
+                    </x-filament::button>
+                    <x-filament::button type="button" color="secondary"
+                        x-on:click="$dispatch('close-modal', { id: 'edit-folder-modal-handle' })">
+                        Cancel
+                    </x-filament::button>
+                </div>
+            </x-slot>
+        </form>
+    </x-filament::modal>
+
     {{-- delete modal --}}
     <x-filament::modal id="delete-folder-modal-handle" width="sm" class="p-4 space-y-2 text-center dark:text-white"
         displayClasses="block">

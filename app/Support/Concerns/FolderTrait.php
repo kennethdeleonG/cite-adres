@@ -30,8 +30,8 @@ trait FolderTrait
                 'label' => 'Move to',
             ],
             [
-                'action' => 'view-details',
-                'label' => 'View Details',
+                'action' => 'show-history',
+                'label' => 'Show History',
             ],
         ];
     }
