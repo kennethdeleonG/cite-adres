@@ -388,6 +388,8 @@ class Documents extends Page
                     )
                 ),
                 'delete' => $this->emitTo('filament.livewire.asset-modal', 'deleteAsset', $asset),
+                'edit' => redirect(route('filament.resources.assets.edit', ['record' => $asset, 'ownerRecord' => $asset->folder])),
+                'show-history' => redirect(route('filament.pages./documents/history/{subjectType?}/{subjectId?}', ['subjectType' => 'assets', 'subjectId' => $asset->id])),
                 default => null
             };
         }
