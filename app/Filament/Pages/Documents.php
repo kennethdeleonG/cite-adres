@@ -261,6 +261,15 @@ class Documents extends Page
 
                     break;
                 }
+            case 'move': {
+                    $folderToMoved = json_decode($record);
+
+                    $this->folderList = $this->folderList->reject(function ($item) use ($folderToMoved) {
+                        return $item->id === $folderToMoved->id;
+                    });
+
+                    break;
+                }
             default: {
                     break;
                 }
@@ -332,6 +341,11 @@ class Documents extends Page
                     }
                 case 'delete': {
                         $this->emitTo('filament.livewire.folder-modal', 'deleteFolder', $folder);
+                        break;
+                    }
+                case 'move-to': {
+                        $this->emitTo('filament.livewire.folder-modal', 'moveFolder', $folder);
+
                         break;
                     }
                 default: {

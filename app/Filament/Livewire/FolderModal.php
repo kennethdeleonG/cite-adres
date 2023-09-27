@@ -3,6 +3,7 @@
 namespace App\Filament\Livewire;
 
 use App\Domain\Folder\Actions\DeleteFolderAction;
+use App\Domain\Folder\Actions\MoveFolderAction;
 use App\Domain\Folder\Actions\UpdateFolderAction;
 use App\Domain\Folder\DataTransferObjects\FolderData;
 use App\Domain\Folder\Models\Folder;
@@ -12,6 +13,8 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Filament\Forms;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class FolderModal extends Component implements HasForms
 {
@@ -149,5 +152,130 @@ class FolderModal extends Component implements HasForms
                     ->send();
             }
         }
+    }
+
+    //move listener
+    public function moveFolderModal(array $data): void
+    {
+        $folderModel = Folder::with('assets')->find($data['id']);
+
+        $this->dispatchBrowserEvent('open-modal', ['id' => 'move-folder-modal-handle']);
+        $this->folder = $folderModel instanceof Folder ? $folderModel : null;
+        $this->folderName = $folderModel instanceof Folder ? $folderModel->name : null;
+        $this->folderId = $folderModel instanceof Folder ? $folderModel->id : null;
+    }
+
+    //moving of folder
+    /** @return Collection<int, Folder> */
+    public function getMoveFolders(): Collection
+    {
+        $result = Folder::where(function ($query) {
+            if ($this->navigateFolderId) {
+                $query->where('folder_id', $this->navigateFolderId);
+            } else {
+                $query->whereNull('folder_id');
+            }
+        })->orderBy('name')->get();
+
+        return $result;
+    }
+
+    //$moveTo is the id of folder
+    public function moveFolder(?int $moveTo = null): void
+    {
+        $folderId = $this->folder?->folder_id;
+
+        if ($folderId === $moveTo) {
+            Notification::make()
+                ->title("Can't Move. This Asset is already in this directory.")
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $convertedName = '';
+        $convertedSlug = '';
+        $updatedPath = '';
+        if (is_null($moveTo)) {
+            $convertedName = $this->folderName;
+            $convertedSlug = $convertedName ? Str::slug($convertedName) : '';
+            $updatedPath = $this->folder ? '/' . $this->folder->slug : '';
+        } else {
+
+            if (is_null($this->folder)) {
+                return;
+            }
+            //check if this folder name is existing dun sa pagmomove-an na directory
+            $existingRecords = DB::table('folders')->where('name', 'LIKE', $this->folderName . '%')->where('folder_id', $moveTo)->count();
+
+            if ($existingRecords > 0) {
+                $convertedName = $this->folderName . ' - (' . $existingRecords . ')';
+            } else {
+                $convertedName = $this->folderName;
+            }
+
+            $convertedSlug = $convertedName ? Str::slug($convertedName) : '';
+            $folder = Folder::find($moveTo);
+            if ($folder && !is_null($folder->ancestors)) {
+                $folderPath = $folder->path . '/' . $convertedSlug;
+                $updatedPath = $folderPath;
+            }
+        }
+
+        $data['name'] = $convertedName;
+        $data['slug'] = $convertedSlug;
+        $data['path'] = $updatedPath;
+        $data['folder_id'] = $moveTo;
+        $parentId = $this->folder ? $this->folder->folder_id : null;
+
+        if (isset($this->folder)) {
+            $result = app(MoveFolderAction::class)
+                ->execute($this->folder, FolderData::fromArray($data));
+
+            if ($result instanceof Folder) {
+                $this->emitUp('refreshPage', 'move', json_encode($result));
+                $this->dispatchBrowserEvent('close-modal', ['id' => 'move-folder-modal-handle']);
+                Notification::make()
+                    ->title('Folder Moved')
+                    ->success()
+                    ->send();
+                if ($moveTo != $parentId) {
+                    app(UpdateFolderAction::class)
+                        ->updateDescendantPaths($this->folder, $updatedPath);
+                }
+            }
+        }
+    }
+
+    public function navigateMove(?int $folderId = null): void
+    {
+        $this->navigateFolderId = $folderId;
+
+        $record = Folder::where('id', $folderId)->with('parent')->first();
+
+        if ($record) {
+            $this->navigateFolderName = $record->name;
+
+            if ($record->parent) {
+                $this->previousFolderId = $record->parent->id;
+            } else {
+                $this->previousFolderId = null;
+            }
+        } else {
+            $this->navigateFolderName = '';
+            $this->previousFolderId = null;
+        }
+
+        $this->getMoveFolders();
+    }
+
+    public function closeMoveModal(): void
+    {
+        $this->folderId = null;
+        $this->folderName = null;
+        $this->navigateFolderId = null;
+        $this->navigateFolderName = null;
+        $this->previousFolderId = null;
     }
 }
