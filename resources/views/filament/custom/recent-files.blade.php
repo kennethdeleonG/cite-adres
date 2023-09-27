@@ -2,7 +2,7 @@
     <x-filament::widgets :widgets="$this->getWidgets()" :columns="$this->getColumns()" />
 
     <x-filament::modal.heading>
-        Recent Files
+        Recent (5) Files
     </x-filament::modal.heading>
 
     <div
