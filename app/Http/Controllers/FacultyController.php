@@ -9,6 +9,7 @@ use App\Domain\Faculty\Models\Faculty;
 use App\Domain\Faculty\Requests\StoreFacultyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class FacultyController extends Controller
@@ -35,14 +36,22 @@ class FacultyController extends Controller
         ]);
 
         $faculty = Faculty::where('email', $validated['email'])
-            ->where('password', $validated['password'])
             ->where('status', FacultyStatuses::ACTIVE)
             ->first();
 
-        if ($faculty === null) {
-            return redirect()->route('login.index')->with('error', 'No Account Found.');
+        if ($faculty === null || !Hash::check($validated['password'], $faculty->password)) {
+            return redirect()->route('login.index')->with('error', 'Invalid credentials.');
         }
 
-        dd($faculty);
+        if (auth()->guard('faculties')->attempt([
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ])) {
+            session()->regenerate();
+
+            // dd(auth()->guard('faculties')->user());
+
+            return redirect(route('filament.pages./faculty/dashboard'));
+        }
     }
 }

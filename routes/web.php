@@ -40,7 +40,7 @@ Route::get('faculty/email/verify/{faculty}/{hash}', function ($facultyId, $hash)
     $faculty = Faculty::findOrFail($facultyId);
     $faculty->markEmailAsVerified();
 
-    return redirect()->route('login')->withFlashSuccess(__('Email Verified, you can now login.'));
+    return redirect()->route('login.index')->withFlashSuccess(__('Email Verified, you can now login.'));
 })->name('faculty.verification.verify');
 
 Route::get('/download-singlefile', function () {

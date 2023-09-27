@@ -7,6 +7,7 @@ namespace App\Domain\Faculty\Actions;
 use App\Domain\Faculty\DataTransferObjects\FacultyData;
 use App\Domain\Faculty\Models\Faculty;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Hash;
 
 class CreateFacultyAction
 {
@@ -16,7 +17,7 @@ class CreateFacultyAction
             'first_name' => $facultyData->first_name,
             'last_name' => $facultyData->last_name,
             'email' => $facultyData->email,
-            'password' => $facultyData->password,
+            'password' => Hash::make($facultyData->password),
             'address' => $facultyData->address,
             'gender' => $facultyData->gender,
             'mobile' => $facultyData->mobile,

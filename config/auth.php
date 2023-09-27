@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Faculty\Models\Faculty;
+
 return [
 
     /*
@@ -43,6 +45,10 @@ return [
         'user' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+        'faculties' => [
+            'driver' => 'session',
+            'provider' => 'faculties',
         ]
     ],
 
@@ -68,7 +74,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
+        'faculties' => [
+            'driver' => 'eloquent',
+            'model' => Faculty::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
