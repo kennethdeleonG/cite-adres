@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Livewire;
 
 use App\Domain\Asset\Actions\DeleteAssetAction;
+use App\Domain\Asset\Actions\MoveAssetAction;
 use App\Domain\Asset\Models\Asset;
+use App\Domain\Folder\Models\Folder;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Livewire\Component;
@@ -71,5 +73,93 @@ class AssetModal extends Component implements HasForms
                     ->send();
             }
         }
+    }
+
+    // link to listener
+    public function moveAssetToFolderModal(array $data): void
+    {
+        $assetModel = Asset::with('folder')->find($data['id']);
+
+        $this->dispatchBrowserEvent('open-modal', ['id' => 'move-asset-modal-handle']);
+
+        $this->asset = $assetModel instanceof Asset ? $assetModel : null;
+    }
+
+    //moving of asset
+    /** @return Collection<int, Folder> */
+    public function getMoveFolders(): Collection
+    {
+        $result = Folder::where(function ($query) {
+            if ($this->navigateFolderId) {
+                $query->where('folder_id', $this->navigateFolderId);
+            } else {
+                $query->whereNull('folder_id');
+            }
+        })->orderBy('name')->get();
+
+        return $result;
+    }
+
+    public function navigateMove(?int $folderId = null): void
+    {
+        $this->navigateFolderId = $folderId;
+
+        $record = Folder::where('id', $folderId)->with('parent')->first();
+
+        if ($record) {
+            $this->navigateFolderName = $record->name;
+
+            if ($record->parent) {
+                $this->previousFolderId = $record->parent->id;
+            } else {
+                $this->previousFolderId = null;
+            }
+        } else {
+            $this->navigateFolderName = '';
+            $this->previousFolderId = null;
+        }
+
+        $this->getMoveFolders();
+    }
+
+    //$moveTo is the id of folder
+    public function moveAsset(?int $moveTo = null): void
+    {
+        /** @var int */
+        $folderId = $this->asset?->folder_id;
+
+        if ($folderId === $moveTo) {
+            Notification::make()
+                ->title("Can't Move. This Asset is already in this directory.")
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $oldPath = $this->asset && $this->asset->folder ? $this->asset->folder->path : '';
+        $parent = Folder::find($moveTo);
+
+        $newPath = $parent ? $parent->path : '';
+
+        $result = app(MoveAssetAction::class)
+            ->execute($this->asset, $moveTo, $oldPath, $newPath);
+
+        if ($result instanceof Asset) {
+            $this->emitUp('refreshPage', 'move-asset', json_encode($result));
+            $this->dispatchBrowserEvent('close-modal', ['id' => 'move-asset-modal-handle']);
+            Notification::make()
+                ->title('Asset Moved')
+                ->success()
+                ->send();
+        }
+    }
+
+    public function closeMoveModalAsset(): void
+    {
+        $this->assetName = null;
+        $this->navigateFolderId = null;
+        $this->navigateFolderName = null;
+        $this->previousFolderId = null;
     }
 }

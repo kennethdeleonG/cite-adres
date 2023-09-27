@@ -99,12 +99,9 @@
                 <x-filament::modal.subheading>
                     <div class="flex justify-start items-center">
                         @if (!is_null($this->navigateFolderId))
-                            <div class="mr-2" wire:click="navigateMove({{ $this->previousFolderId }})">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round"
-                                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
+                            <div class="mr-2">
+                                <x-heroicon-o-arrow-left class="h-5 cursor-pointer"
+                                    wire:click="navigateMove({{ $this->previousFolderId }})" />
                             </div>
                         @endif
                         <div>
@@ -129,11 +126,9 @@
                             <x-dynamic-component class="h-6" component="heroicon-s-folder" />
                             <div class="pl-2"> {{ $folderMove->name }}</div>
                         </div>
-                        <div x-show="showChild" wire:click="navigateMove({{ $folderMove->id }})">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 cursor-pointer" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
+                        <div x-show="showChild">
+                            <x-heroicon-o-arrow-right class="h-5 cursor-pointer"
+                                wire:click="navigateMove({{ $folderMove->id }})" />
                         </div>
                     </div>
                 @endif
