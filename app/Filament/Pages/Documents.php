@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Domain\Asset\Actions\DownloadSingleFileAction;
 use App\Domain\Asset\Models\Asset;
 use App\Domain\Folder\Models\Folder as FolderModel;
 use App\Domain\Folder\Actions\CreateFolderAction;
@@ -367,6 +368,18 @@ class Documents extends Page
         if ($asset) {
             return match ($action) {
                 'open' => redirect(route('filament.resources.assets.edit', ['record' => $asset, 'ownerRecord' => $asset->folder ?? null])),
+                'download' => app(DownloadSingleFileAction::class)->execute(
+                    $asset,
+                    DownloadData::fromArray(
+                        [
+                            'files' => [$asset->file],
+                            'user_type' => 'admin',
+                            'admin_id' => auth()->user()?->id,
+                            'asset_type' => 'asset',
+                            'asset_id' => $asset->id,
+                        ]
+                    )
+                ),
                 default => null
             };
         }
