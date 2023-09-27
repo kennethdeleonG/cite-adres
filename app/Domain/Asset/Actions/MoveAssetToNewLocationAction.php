@@ -19,6 +19,7 @@ class MoveAssetToNewLocationAction
 
             Storage::disk('s3')->move($asset->file, $to);
 
+            $asset->path = $asset->folder?->path;
             $asset->file = $to;
 
             $asset->save();

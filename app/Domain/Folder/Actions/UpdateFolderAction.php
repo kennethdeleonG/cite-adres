@@ -33,10 +33,7 @@ class UpdateFolderAction
 
             foreach ($folder->folders as $childFolder) {
                 $childPath = $newPath . '/' . $childFolder->slug;
-
-                $folder->parent?->is_private ?
-                    $childFolder->update(['path' => $childPath]) :
-                    $childFolder->update(['path' => $childPath, 'is_private' => false]);
+                $childFolder->update(['path' => $childPath]);
 
                 foreach ($childFolder->assets as $asset) {
                     app(MoveAssetToNewLocationAction::class)->execute($asset);

@@ -59,9 +59,13 @@
                 </tr>
             </thead>
             <tbody class="divide-y whitespace-nowrap dark:divide-gray-700">
-                @include('filament.components.recent-files-table-body', [
-                    'actions' => $this->getFolderActions(),
-                ])
+                @foreach ($this->assetList as $asset)
+                    @include('filament.components.document-table-body', [
+                        'document' => $asset,
+                        'type' => 'asset',
+                        'actions' => $this->getAssetActions(),
+                    ])
+                @endforeach
             </tbody>
         </table>
     </div>
