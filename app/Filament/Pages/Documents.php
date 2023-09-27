@@ -348,6 +348,11 @@ class Documents extends Page
 
                         break;
                     }
+                case 'show-history': {
+                        redirect(route('filament.pages./documents/history/{subjectType?}/{subjectId?}', ['subjectType' => 'folders', 'subjectId' => $folder->id]));
+
+                        break;
+                    }
                 default: {
                         break;
                     }
