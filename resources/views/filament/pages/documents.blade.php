@@ -73,4 +73,5 @@
     </div>
 
     <livewire:filament.livewire.folder-modal />
+    <livewire:filament.livewire.asset-modal :folderId="$this->folder_id" />
 </x-filament::page>

@@ -271,6 +271,13 @@ class Documents extends Page
 
                     break;
                 }
+            case 'delete-asset': {
+                    $assetToDelete = json_decode($record);
+
+                    $this->assetList = $this->assetList->reject(function ($item) use ($assetToDelete) {
+                        return $item->id === $assetToDelete->id;
+                    });
+                }
             default: {
                     break;
                 }
@@ -380,6 +387,7 @@ class Documents extends Page
                         ]
                     )
                 ),
+                'delete' => $this->emitTo('filament.livewire.asset-modal', 'deleteAsset', $asset),
                 default => null
             };
         }
