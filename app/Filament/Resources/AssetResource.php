@@ -25,6 +25,11 @@ class AssetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'folder.name',];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
