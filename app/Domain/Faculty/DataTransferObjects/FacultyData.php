@@ -11,8 +11,8 @@ class FacultyData
     public function __construct(
         public readonly string $first_name,
         public readonly string $last_name,
-        public readonly string $address,
-        public readonly string $gender,
+        public readonly string |null $address = null,
+        public readonly string |null $gender = null,
         public readonly string|null $email = null,
         public readonly string|null $password = null,
         public readonly string|null $mobile = null,

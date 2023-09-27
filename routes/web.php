@@ -28,11 +28,13 @@ Route::get('/register', function () {
     return view('register');
 })->name('register.index');
 
+Route::post('/register', [FacultyController::class, 'store'])->name('register.store');
+
 Route::get('/login', function () {
     return view('login');
-})->name('login');
+})->name('login.index');
 
-Route::post('/register', [FacultyController::class, 'store'])->name('register.store');
+Route::post('/login-faculty', [FacultyController::class, 'login'])->name('login.store');
 
 Route::get('faculty/email/verify/{faculty}/{hash}', function ($facultyId, $hash) {
     $faculty = Faculty::findOrFail($facultyId);

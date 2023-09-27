@@ -73,22 +73,36 @@
                         </div>
                     @endif
 
-                    <form>
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            <div class="bg-red-300 text-sm mt-2 text-center py-1 mb-4">
+                                {{ session('error') }}
+                            </div>
+                        </div>
+                    @endif
+
+                    <x-forms.post :action="route('login.store')">
                         <div class="mb-4 ">
                             <label for="email"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email
                                 address</label>
-                            <input type="email" id="email"
+                            <input type="email" id="email" name="email"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="john.doe@bulsu.edu.ph" required>
+                                placeholder="john.doe@bulsu.edu.ph" required value="{{ old('email') }}">
+                            @error('email')
+                                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="mb-4">
                             <label for="password"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                            <input type="password" id="password"
+                            <input type="password" id="password" name="password"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="•••••••••" required>
+                                placeholder="•••••••••" required value="{{ old('password') }}">
+                            @error('password')
+                                <span class="text-red-500 text-sm mt-2">{{ $message }}</span>
+                            @enderror
                         </div>
 
 
@@ -96,7 +110,7 @@
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none
                              focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 
                              text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</button>
-                    </form>
+                    </x-forms.post>
                 </div>
 
                 <h5 class="text-md tracking-tight text-gray-700 dark:text-white mb-4 text-center mt-4">
